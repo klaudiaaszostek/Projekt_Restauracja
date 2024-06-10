@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu - Restauracja XYZ</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Restauracja</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="menu.html">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="contact.html">Kontakt</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container mt-5">
+      <h1>Nasze Menu</h1>
+      <div id="menuAccordion">
+        <div class="card">
+          <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+              <button
+                class="btn btn-link"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseOne"
+                aria-expanded="true"
+                aria-controls="collapseOne"
+              >
+                Przystawki
+              </button>
+            </h2>
+          </div>
+          <div
+            id="collapseOne"
+            class="collapse show"
+            aria-labelledby="headingOne"
+            data-parent="#menuAccordion"
+          >
+            <div class="card-body">
+              <div class="d-flex">
+                <img
+                  src="images/przystawka1.jpg"
+                  alt="Przystawka 1"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Paszteciki</h5>
+                  <p>z ciasta francuskiego z nadzieniem bolognese</p>
+                  <p><strong>Cena: 20 PLN</strong></p>
+                </div>
+              </div>
+              <div class="d-flex">
+                <img
+                  src="images/przystawka2.jpg"
+                  alt="Przystawka 2"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Grillowane kurczaki</h5>
+                  <p>po meksykańsku na patyku</p>
+                  <p><strong>Cena: 25 PLN</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+              <button
+                class="btn btn-link collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                Dania główne
+              </button>
+            </h2>
+          </div>
+          <div
+            id="collapseTwo"
+            class="collapse"
+            aria-labelledby="headingTwo"
+            data-parent="#menuAccordion"
+          >
+            <div class="card-body">
+              <div class="d-flex">
+                <img
+                  src="images/danie1.jpg"
+                  alt="Danie główne 1"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Danie główne 1</h5>
+                  <p>Opis dania głównego 1</p>
+                  <p><strong>Cena: 40 PLN</strong></p>
+                </div>
+              </div>
+              <div class="d-flex">
+                <img
+                  src="images/danie2.jpg"
+                  alt="Danie główne 2"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Danie główne 2</h5>
+                  <p>Opis dania głównego 2</p>
+                  <p><strong>Cena: 45 PLN</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" id="headingThree">
+            <h2 class="mb-0">
+              <button
+                class="btn btn-link collapsed"
+                type="button"
+                data-toggle="collapse"
+                data-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                Desery
+              </button>
+            </h2>
+          </div>
+          <div
+            id="collapseThree"
+            class="collapse"
+            aria-labelledby="headingThree"
+            data-parent="#menuAccordion"
+          >
+            <div class="card-body">
+              <div class="d-flex">
+                <img
+                  src="images/deser1.jpg"
+                  alt="Deser 1"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Deser 1</h5>
+                  <p>Opis deseru 1</p>
+                  <p><strong>Cena: 15 PLN</strong></p>
+                </div>
+              </div>
+              <div class="d-flex">
+                <img
+                  src="images/deser2.jpg"
+                  alt="Deser 2"
+                  class="img-thumbnail mr-3"
+                  style="width: 150px"
+                />
+                <div>
+                  <h5>Deser 2</h5>
+                  <p>Opis deseru 2</p>
+                  <p><strong>Cena: 18 PLN</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
