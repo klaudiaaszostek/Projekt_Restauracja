@@ -1,0 +1,12 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.container h1 {
+  margin-bottom: 30px;
+}
+
+.card-body img {
+  width: 100px;
+  height: auto;
+}
