@@ -39,3 +39,4 @@ Widok personelu – gdzie wyświetlą się kolejne zamówienia
 Widok administratora- który może usuwać i edytować zamówienia
 
 1. Zaprojektowany wstępny wygląd podstron contact.html, index.html, menu.html. Dodane: Bootstrap i jQuery.
+2. Wstępny Back-end w Python (Flask).
