@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField,SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField,SelectField, FloatField,FileField
 from wtforms.validators import DataRequired, Length
 
 class LoginForm(FlaskForm):
@@ -19,3 +19,9 @@ class RegisterForm(FlaskForm):
         ('admin', 'Admin'),
         ('client', 'Client')
     ], validators=[DataRequired(message="Role is required")])   
+
+class DishForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=150)])
+    price = FloatField('Price', validators=[DataRequired()])
+    foto = FileField('Photo', validators=[DataRequired()])
+    submit = SubmitField('Add Dish')

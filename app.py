@@ -1,13 +1,18 @@
+import os
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, DishForm
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['UPLOAD_FOLDER'] = 'uploads/'
 db = SQLAlchemy(app)
+
+
+
 login_manager = LoginManager() #implementuje moduł logowania 
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -24,7 +29,13 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(150), nullable=False)
     role = db.Column(db.String(50), nullable=False)
 
-@app.route('/register', methods=['GET', 'POST'])
+class Dish(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), unique=True, nullable=False)
+    price = db.Column(db.Float(6), nullable=False)
+    foto = db.Column(db.String(255), nullable=False)
+
+@app.route('/', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -42,7 +53,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('menu'))
         flash('Invalid username or password')
     return render_template('login.html', form=form)
 
@@ -52,12 +63,31 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard')
+@app.route('/menu')
 @login_required
-def dashboard():
-    return f'Hello, {current_user.username}!'
+def menu():
+    dishes = Dish.query.all()
+    return render_template('menu.html', dishes=dishes)
+
+@app.route('/add', methods=['GET', 'POST'])
+@login_required
+def add_dish():
+    forms = DishForm()
+    if forms.validate_on_submit():
+        file = forms.foto.data
+        filename = file.filename
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        new_dish = Dish(name=forms.name.data, price=forms.price.data, foto=filepath)
+        db.session.add(new_dish)
+        db.session.commit()
+        
+        return redirect(url_for('menu'))
+    return render_template('add.html', form=forms)
 
 if __name__ == '__main__':
+    app.config['DEBUG'] = True
     with app.app_context():
         db.create_all()
         app.run(port=8000,debug=True)
