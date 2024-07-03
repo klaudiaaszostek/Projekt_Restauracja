@@ -40,3 +40,4 @@ Widok administratora- który może usuwać i edytować zamówienia
 
 1. Zaprojektowany wstępny wygląd podstron contact.html, index.html, menu.html. Dodane: Bootstrap i jQuery.
 2. Wstępny Back-end w Python (Flask).
+3. 3 widoki, koszyk w sesji. Tylko użytkownik z odpowiednią rolą ma dostęp to poszczególnych funkcjonalności.
