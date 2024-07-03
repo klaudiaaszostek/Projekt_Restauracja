@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 import sqlite3
+import json
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -139,9 +140,10 @@ def customer():
     conn = get_db_connection()
     if request.method == 'POST':
         if 'cart' in session:
-            for item in session['cart']:
-                conn.execute('INSERT INTO orders (user_id, item_name, item_description, item_price, quantity, status) VALUES (?, ?, ?, ?, ?, ?)',
-                             (session['user_id'], item['name'], item['description'], item['price'], item['quantity'], 'Przyjęte'))
+            order_items = json.dumps(session['cart'])
+            total_price = calculate_total_cost(session['cart'])
+            conn.execute('INSERT INTO orders (user_id, order_items, total_price, status) VALUES (?, ?, ?, ?)',
+                         (session['user_id'], order_items, total_price, 'Przyjęte'))
             conn.commit()
             session.pop('cart', None)
             flash('Zamówienie złożone pomyślnie.', 'success')
@@ -180,12 +182,16 @@ def admin():
     conn.close()
     return render_template('admin.html', orders=orders)
 
+def calculate_total_cost(cart):
+    return sum(item['price'] * item['quantity'] for item in cart)
+
 @app.context_processor
 def utility_processor():
-    def calculate_total_cost(cart):
-        return sum(item['price'] * item['quantity'] for item in cart)
     return dict(calculate_total_cost=calculate_total_cost)
 
+@app.template_filter('fromjson')
+def fromjson(value):
+    return json.loads(value)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -40,26 +40,31 @@
 </p>
 <form method="POST" action="/customer">
   <button type="submit" class="btn btn-primary">Zamów</button>
-</form>
+</form><br><br><br>
+
 
 <h2>Twoje zamówienia</h2>
 <table class="table">
   <thead>
     <tr>
-      <th>Nazwa dania</th>
-      <th>Opis</th>
-      <th>Cena</th>
-      <th>Ilość</th>
+      <th>ID zamówienia</th>
+      <th>Pozycje</th>
+      <th>Łączny koszt</th>
       <th>Status</th>
     </tr>
   </thead>
   <tbody>
     {% for order in orders %}
     <tr>
-      <td>{{ order.item_name }}</td>
-      <td>{{ order.item_description }}</td>
-      <td>{{ order.item_price }} PLN</td>
-      <td>{{ order.quantity }}</td>
+      <td>{{ order.id }}</td>
+      <td>
+        <ul>
+          {% set items = order.order_items | fromjson %} {% for item in items %}
+          <li>{{ item.name }} x{{ item.quantity }} ({{ item.price }} PLN)</li>
+          {% endfor %}
+        </ul>
+      </td>
+      <td>{{ order.total_price }} PLN</td>
       <td>{{ order.status }}</td>
     </tr>
     {% endfor %}

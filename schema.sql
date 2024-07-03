@@ -8,10 +8,8 @@ CREATE TABLE users (
 CREATE TABLE orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
-    item_name TEXT,
-    item_description TEXT,
-    item_price REAL,
-    quantity INTEGER,
+    order_items TEXT,
+    total_price REAL,
     status TEXT DEFAULT 'Przyjęte',
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
