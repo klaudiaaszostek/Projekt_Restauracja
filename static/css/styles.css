@@ -7,6 +7,12 @@ body {
 }
 
 .card-body img {
-  width: 100px;
+  width: 100%;
+  max-width: 250px;
   height: auto;
+  transition: transform 0.2s ease-in-out; /* Animacja powiększania */
+}
+
+.card-body img:hover {
+  transform: scale(1.5); /* Zwiększenie skali powiększenia */
 }

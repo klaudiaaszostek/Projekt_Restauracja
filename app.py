@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, flash
 from functools import wraps
 import sqlite3
 
@@ -9,6 +9,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'logged_in' not in session:
+            flash('Musisz być zalogowany, aby uzyskać dostęp do tej strony.', 'warning')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -17,6 +18,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get('role') != 'admin':
+            flash('Nie masz uprawnień, aby uzyskać dostęp do tej strony.', 'danger')
             return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
@@ -25,6 +27,7 @@ def staff_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get('role') not in ['admin', 'staff']:
+            flash('Nie masz uprawnień, aby uzyskać dostęp do tej strony.', 'danger')
             return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
@@ -58,6 +61,7 @@ def menu():
 
         session['cart'].append(cart_item)
         session.modified = True
+        flash('Dodano do koszyka: {} x{}'.format(item_name, item_quantity), 'success')
         return redirect(url_for('menu'))
 
     menu_items = {
@@ -93,6 +97,7 @@ def register():
         conn.commit()
         conn.close()
         
+        flash('Rejestracja zakończona sukcesem. Możesz się teraz zalogować.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -112,9 +117,10 @@ def login():
             session['username'] = user['username']
             session['role'] = user['role']
             session['user_id'] = user['id']
+            flash('Zalogowano pomyślnie.', 'success')
             return redirect(url_for('home'))
         else:
-            return 'Invalid credentials'
+            flash('Nieprawidłowa nazwa użytkownika lub hasło.', 'danger')
     
     return render_template('login.html')
 
@@ -122,6 +128,7 @@ def login():
 @login_required
 def logout():
     session.clear()
+    flash('Wylogowano pomyślnie.', 'success')
     return redirect(url_for('home'))
 
 @app.route('/customer', methods=['GET', 'POST'])
@@ -135,6 +142,7 @@ def customer():
                              (session['user_id'], item['name'], item['description'], item['price'], item['quantity'], 'Przyjęte'))
             conn.commit()
             session.pop('cart', None)
+            flash('Zamówienie złożone pomyślnie.', 'success')
     
     orders = conn.execute('SELECT * FROM orders WHERE user_id = ?', (session['user_id'],)).fetchall()
     conn.close()
@@ -158,10 +166,12 @@ def admin():
         if 'delete' in request.form:
             order_id = request.form['order_id']
             conn.execute('DELETE FROM orders WHERE id = ?', (order_id,))
+            flash('Zamówienie zostało usunięte.', 'success')
         elif 'update' in request.form:
             order_id = request.form['order_id']
             status = request.form['status']
             conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
+            flash('Status zamówienia został zaktualizowany.', 'success')
         conn.commit()
     
     orders = conn.execute('SELECT * FROM orders').fetchall()
