@@ -7,23 +7,37 @@
 <table class="table">
   <thead>
     <tr>
+      <th>Zdjęcie</th>
       <th>Nazwa dania</th>
       <th>Opis</th>
       <th>Cena</th>
       <th>Ilość</th>
+      <th>Łączny koszt</th>
     </tr>
   </thead>
   <tbody>
     {% for item in session.cart %}
     <tr>
+      <td>
+        <img
+          src="{{ url_for('static', filename='images/' ~ item.image) }}"
+          alt="{{ item.name }}"
+          class="img-thumbnail"
+          style="max-width: 100px"
+        />
+      </td>
       <td>{{ item.name }}</td>
       <td>{{ item.description }}</td>
       <td>{{ item.price }} PLN</td>
       <td>{{ item.quantity }}</td>
+      <td>{{ item.price * item.quantity }} PLN</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+<p>
+  <strong>Całkowity koszt: {{ calculate_total_cost(session.cart) }} PLN</strong>
+</p>
 <form method="POST" action="/customer">
   <button type="submit" class="btn btn-primary">Zamów</button>
 </form>

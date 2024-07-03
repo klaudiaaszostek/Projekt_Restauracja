@@ -51,12 +51,14 @@ def menu():
         item_description = request.form['item_description']
         item_price = request.form['item_price']
         item_quantity = int(request.form['quantity'])
+        item_image = request.form['item_image']
 
         cart_item = {
             'name': item_name,
             'description': item_description,
             'price': float(item_price),
-            'quantity': item_quantity
+            'quantity': item_quantity,
+            'image': item_image
         }
 
         session['cart'].append(cart_item)
@@ -177,6 +179,13 @@ def admin():
     orders = conn.execute('SELECT * FROM orders').fetchall()
     conn.close()
     return render_template('admin.html', orders=orders)
+
+@app.context_processor
+def utility_processor():
+    def calculate_total_cost(cart):
+        return sum(item['price'] * item['quantity'] for item in cart)
+    return dict(calculate_total_cost=calculate_total_cost)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
