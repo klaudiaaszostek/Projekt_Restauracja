@@ -1,27 +1,29 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField,SelectField, FloatField,FileField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FormField, FieldList, HiddenField, FileField
+from wtforms.validators import DataRequired, Length, NumberRange
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=150)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=150)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(message="Username is required"),
-        Length(min=4, max=150, message="Username must be between 4 and 150 characters")])
-    password = PasswordField('Password', validators=[DataRequired(message="Password is required")])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=150)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    role = StringField('Role', validators=[DataRequired()])
     submit = SubmitField('Register')
-    role = SelectField('Role', choices=[
-        ('employee', 'Employee'),
-        ('admin', 'Admin'),
-        ('client', 'Client')
-    ], validators=[DataRequired(message="Role is required")])   
 
 class DishForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=150)])
-    price = FloatField('Price', validators=[DataRequired()])
-    foto = FileField('Photo', validators=[DataRequired()])
+    price = IntegerField('Price', validators=[DataRequired(), NumberRange(min=0)])
+    foto = FileField('Foto', validators=[DataRequired()])
     submit = SubmitField('Add Dish')
+
+class DishOrderForm(FlaskForm):
+    dish_id = HiddenField(validators=[DataRequired()])
+    quantity = IntegerField('Quantity', validators=[DataRequired()], default=0)
+
+class MenuOrderForm(FlaskForm):
+    dishes = FieldList(FormField(DishOrderForm), min_entries=0)
+    submit = SubmitField('Submit Order')

@@ -1,22 +1,21 @@
-<!-- menu.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu</title>
 </head>
 <body>
     <h1>Menu</h1>
-    <div>
-        {% for dish in dishes %}
+    <form method="post">
+        {{ form.hidden_tag() }}
+        {% for dish_form, dish in dish_data %}
             <div>
-                <h2>{{ dish.name }}</h2>
-                <p>Price: {{ dish.price }}</p>
-                <img src="{{ url_for('static', filename='uploads/' + dish.foto) }}" alt="{{ dish.name }} Photo">
+                <img src="{{ url_for('static', filename=dish.foto) }}" alt="{{ dish.name }}" style="width:100px;height:100px;">
+                <label>{{ dish.name }} - ${{ dish.price }}</label>
+                {{ dish_form.dish_id }}
+                {{ dish_form.quantity }}
             </div>
         {% endfor %}
-    </div>
+        {{ form.submit() }}
+    </form>
 </body>
 </html>
