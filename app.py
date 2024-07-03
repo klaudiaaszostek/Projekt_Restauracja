@@ -38,8 +38,28 @@ def get_db_connection():
 def home():
     return render_template('index.html')
 
-@app.route('/menu')
+@app.route('/menu', methods=['GET', 'POST'])
 def menu():
+    if 'cart' not in session:
+        session['cart'] = []
+
+    if request.method == 'POST':
+        item_name = request.form['item_name']
+        item_description = request.form['item_description']
+        item_price = request.form['item_price']
+        item_quantity = int(request.form['quantity'])
+
+        cart_item = {
+            'name': item_name,
+            'description': item_description,
+            'price': float(item_price),
+            'quantity': item_quantity
+        }
+
+        session['cart'].append(cart_item)
+        session.modified = True
+        return redirect(url_for('menu'))
+
     menu_items = {
         'Przystawki': [
             {'name': 'Przystawka 1', 'description': 'Opis przystawki 1', 'price': 20, 'image': 'przystawka1.jpg'},
@@ -109,18 +129,16 @@ def logout():
 def customer():
     conn = get_db_connection()
     if request.method == 'POST':
-        item_name = request.form['item_name']
-        item_description = request.form['item_description']
-        item_price = request.form['item_price']
-        user_id = session['user_id']
-        
-        conn.execute('INSERT INTO orders (user_id, item_name, item_description, item_price) VALUES (?, ?, ?, ?)',
-                     (user_id, item_name, item_description, item_price))
-        conn.commit()
+        if 'cart' in session:
+            for item in session['cart']:
+                conn.execute('INSERT INTO orders (user_id, item_name, item_description, item_price, quantity, status) VALUES (?, ?, ?, ?, ?, ?)',
+                             (session['user_id'], item['name'], item['description'], item['price'], item['quantity'], 'Przyjęte'))
+            conn.commit()
+            session.pop('cart', None)
     
-    menu_items = conn.execute('SELECT * FROM orders WHERE user_id = ?', (session['user_id'],)).fetchall()
+    orders = conn.execute('SELECT * FROM orders WHERE user_id = ?', (session['user_id'],)).fetchall()
     conn.close()
-    return render_template('customer.html', menu_items=menu_items)
+    return render_template('customer.html', orders=orders)
 
 @app.route('/staff')
 @login_required

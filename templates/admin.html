@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administrator - Restauracja XYZ</title>
+    <title>Personel - Restauracja XYZ</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
@@ -28,11 +28,39 @@
                     <a class="nav-link" href="/logout">Logout</a>
                 </li>
             </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="cartDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Koszyk (<span id="cart-count">{{ session.cart|length if session.cart else 0 }}</span>)
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right p-3" aria-labelledby="cartDropdown" style="min-width: 300px;">
+                        <h5 class="dropdown-header">Koszyk</h5>
+                        <div id="cart-items">
+                            {% if session.cart %}
+                                {% for item in session.cart %}
+                                    <div class="dropdown-item d-flex justify-content-between align-items-center">
+                                        <span>{{ item.name }} x{{ item.quantity }}</span>
+                                        <span>{{ item.price * item.quantity }} PLN</span>
+                                    </div>
+                                {% endfor %}
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item text-center">
+                                    <a href="/customer" class="btn btn-primary btn-sm">Zobacz koszyk</a>
+                                </div>
+                            {% else %}
+                                <div class="dropdown-item text-center">
+                                    <span>Koszyk jest pusty</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
     </nav>
     <div class="container mt-5">
         <h1>Witaj, {{ session['username'] }}</h1>
-        <p>Tu możesz zarządzać zamówieniami i użytkownikami.</p>
+        <p>Tu możesz przeglądać i zarządzać zamówieniami.</p>
         
         <h2>Zamówienia</h2>
         <table class="table">
@@ -43,8 +71,8 @@
                     <th>Nazwa dania</th>
                     <th>Opis</th>
                     <th>Cena</th>
+                    <th>Ilość</th>
                     <th>Status</th>
-                    <th>Akcje</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,22 +83,8 @@
                     <td>{{ order.item_name }}</td>
                     <td>{{ order.item_description }}</td>
                     <td>{{ order.item_price }} PLN</td>
+                    <td>{{ order.quantity }}</td>
                     <td>{{ order.status }}</td>
-                    <td>
-                        <form method="POST" action="/admin" class="d-inline">
-                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                            <select name="status" class="form-control d-inline" style="width: auto;">
-                                <option value="Przyjęte" {% if order.status == 'Przyjęte' %}selected{% endif %}>Przyjęte</option>
-                                <option value="W realizacji" {% if order.status == 'W realizacji' %}selected{% endif %}>W realizacji</option>
-                                <option value="Zrealizowane" {% if order.status == 'Zrealizowane' %}selected{% endif %}>Zrealizowane</option>
-                            </select>
-                            <button type="submit" name="update" class="btn btn-primary btn-sm">Aktualizuj</button>
-                        </form>
-                        <form method="POST" action="/admin" class="d-inline">
-                            <input type="hidden" name="order_id" value="{{ order.id }}">
-                            <button type="submit" name="delete" class="btn btn-danger btn-sm">Usuń</button>
-                        </form>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

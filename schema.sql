@@ -11,6 +11,7 @@ CREATE TABLE orders (
     item_name TEXT,
     item_description TEXT,
     item_price REAL,
+    quantity INTEGER,
     status TEXT DEFAULT 'Przyjęte',
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
