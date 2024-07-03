@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator - Restauracja XYZ</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Restauracja XYZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/menu">Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Kontakt</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Witaj, {{ session['username'] }}</h1>
+        <p>Tu możesz zarządzać zamówieniami i użytkownikami.</p>
+        
+        <h2>Zamówienia</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID zamówienia</th>
+                    <th>Klient</th>
+                    <th>Nazwa dania</th>
+                    <th>Opis</th>
+                    <th>Cena</th>
+                    <th>Status</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user_id }}</td>
+                    <td>{{ order.item_name }}</td>
+                    <td>{{ order.item_description }}</td>
+                    <td>{{ order.item_price }} PLN</td>
+                    <td>{{ order.status }}</td>
+                    <td>
+                        <form method="POST" action="/admin" class="d-inline">
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <select name="status" class="form-control d-inline" style="width: auto;">
+                                <option value="Przyjęte" {% if order.status == 'Przyjęte' %}selected{% endif %}>Przyjęte</option>
+                                <option value="W realizacji" {% if order.status == 'W realizacji' %}selected{% endif %}>W realizacji</option>
+                                <option value="Zrealizowane" {% if order.status == 'Zrealizowane' %}selected{% endif %}>Zrealizowane</option>
+                            </select>
+                            <button type="submit" name="update" class="btn btn-primary btn-sm">Aktualizuj</button>
+                        </form>
+                        <form method="POST" action="/admin" class="d-inline">
+                            <input type="hidden" name="order_id" value="{{ order.id }}">
+                            <button type="submit" name="delete" class="btn btn-danger btn-sm">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
