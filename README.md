@@ -38,6 +38,9 @@ Widok personelu – gdzie wyświetlą się kolejne zamówienia
 
 Widok administratora- który może usuwać i edytować zamówienia
 
+
+Etapy:
 1. Zaprojektowany wstępny wygląd podstron contact.html, index.html, menu.html. Dodane: Bootstrap i jQuery.
 2. Wstępny Back-end w Python (Flask).
 3. 3 widoki, koszyk w sesji. Tylko użytkownik z odpowiednią rolą ma dostęp to poszczególnych funkcjonalności.
+4. Usprawnienie zarządzania zamówieniami, różne w zależności od roli przypisanej do użytkownika.

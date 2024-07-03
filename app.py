@@ -152,11 +152,19 @@ def customer():
     conn.close()
     return render_template('customer.html', orders=orders)
 
-@app.route('/staff')
+@app.route('/staff', methods=['GET', 'POST'])
 @login_required
 @staff_required
 def staff():
     conn = get_db_connection()
+    if request.method == 'POST':
+        if 'update' in request.form:
+            order_id = request.form['order_id']
+            status = request.form['status']
+            conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
+            flash('Status zamówienia został zaktualizowany.', 'success')
+        conn.commit()
+    
     orders = conn.execute('SELECT * FROM orders').fetchall()
     conn.close()
     return render_template('staff.html', orders=orders)
@@ -176,6 +184,13 @@ def admin():
             status = request.form['status']
             conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
             flash('Status zamówienia został zaktualizowany.', 'success')
+        elif 'edit' in request.form:
+            order_id = request.form['order_id']
+            order_items = json.loads(request.form['order_items'])
+            total_price = sum(item['price'] * item['quantity'] for item in order_items)
+            conn.execute('UPDATE orders SET order_items = ?, total_price = ? WHERE id = ?', 
+                         (json.dumps(order_items), total_price, order_id))
+            flash('Zamówienie zostało zaktualizowane.', 'success')
         conn.commit()
     
     orders = conn.execute('SELECT * FROM orders').fetchall()

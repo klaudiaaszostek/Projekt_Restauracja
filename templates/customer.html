@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block title %}Klient - Restauracja XYZ{% endblock
-%} {% block content %}
+{% extends "base.html" %} {% block title %}Koszyk i zamówienia - Restauracja
+XYZ{% endblock %} {% block content %}
 <h1>Witaj, {{ session['username'] }}</h1>
 <p>Tu możesz przeglądać i zamawiać dania.</p>
 
@@ -40,8 +40,7 @@
 </p>
 <form method="POST" action="/customer">
   <button type="submit" class="btn btn-primary">Zamów</button>
-</form><br><br><br>
-
+</form>
 
 <h2>Twoje zamówienia</h2>
 <table class="table">

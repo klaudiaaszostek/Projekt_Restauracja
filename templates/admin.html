@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Administrator - Restauracja XYZ{% endblock %}
+{% block title %}Zarządzanie zamówieniami - Restauracja XYZ{% endblock %}
 {% block content %}
-    <h1>Witaj, {{ session['username'] }}</h1>
+    <h1>Zarządzanie zamówieniami</h1>
     <p>Tu możesz zarządzać zamówieniami i użytkownikami.</p>
     
     <h2>Zamówienia</h2>
@@ -10,10 +10,8 @@
             <tr>
                 <th>ID zamówienia</th>
                 <th>Klient</th>
-                <th>Nazwa dania</th>
-                <th>Opis</th>
-                <th>Cena</th>
-                <th>Ilość</th>
+                <th>Pozycje</th>
+                <th>Łączny koszt</th>
                 <th>Status</th>
                 <th>Akcje</th>
             </tr>
@@ -23,10 +21,15 @@
             <tr>
                 <td>{{ order.id }}</td>
                 <td>{{ order.user_id }}</td>
-                <td>{{ order.item_name }}</td>
-                <td>{{ order.item_description }}</td>
-                <td>{{ order.item_price }} PLN</td>
-                <td>{{ order.quantity }}</td>
+                <td>
+                    <ul>
+                        {% set items = order.order_items | fromjson %}
+                        {% for item in items %}
+                        <li>{{ item.name }} x{{ item.quantity }} ({{ item.price }} PLN)</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ order.total_price }} PLN</td>
                 <td>{{ order.status }}</td>
                 <td>
                     <form method="POST" action="/admin" class="d-inline">
@@ -42,9 +45,83 @@
                         <input type="hidden" name="order_id" value="{{ order.id }}">
                         <button type="submit" name="delete" class="btn btn-danger btn-sm">Usuń</button>
                     </form>
+                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#editOrderModal{{ order.id }}">Edytuj</button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    {% for order in orders %}
+    <!-- Edit Order Modal -->
+    <div class="modal fade" id="editOrderModal{{ order.id }}" tabindex="-1" aria-labelledby="editOrderModalLabel{{ order.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editOrderModalLabel{{ order.id }}">Edytuj zamówienie #{{ order.id }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="/admin">
+                        <input type="hidden" name="order_id" value="{{ order.id }}">
+                        <div id="order-items-{{ order.id }}">
+                            {% set items = order.order_items | fromjson %}
+                            {% for item in items %}
+                            <div class="form-row mb-3">
+                                <div class="col">
+                                    <input type="text" class="form-control" name="item_name" value="{{ item.name }}" readonly>
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" name="item_quantity" value="{{ item.quantity }}" min="1">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" name="item_price" value="{{ item.price }}" readonly>
+                                </div>
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger remove-item">Usuń</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-secondary add-item">Dodaj pozycję</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                            <button type="submit" name="edit" class="btn btn-primary">Zapisz zmiany</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <script>
+        $(document).ready(function() {
+            $('.remove-item').on('click', function() {
+                $(this).closest('.form-row').remove();
+            });
+
+            $('.add-item').on('click', function() {
+                var orderId = $(this).closest('.modal').attr('id').replace('editOrderModal', '');
+                var newItemRow = `
+                    <div class="form-row mb-3">
+                        <div class="col">
+                            <input type="text" class="form-control" name="item_name" placeholder="Nazwa dania">
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="item_quantity" value="1" min="1">
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" name="item_price" placeholder="Cena">
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-danger remove-item">Usuń</button>
+                        </div>
+                    </div>`;
+                $('#order-items-' + orderId).append(newItemRow);
+            });
+        });
+    </script>
 {% endblock %}

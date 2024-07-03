@@ -42,7 +42,19 @@
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
-          {% else %}
+          {% if session.get('role') == 'customer' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/customer">Koszyk i zamówienia</a>
+          </li>
+          {% elif session.get('role') == 'staff' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/staff">Zamówienia</a>
+          </li>
+          {% elif session.get('role') == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Zarządzanie zamówieniami</a>
+          </li>
+          {% endif %} {% else %}
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
