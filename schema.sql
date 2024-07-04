@@ -13,3 +13,4 @@ CREATE TABLE orders (
     status TEXT DEFAULT 'Przyjęte',
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+

@@ -186,7 +186,14 @@ def admin():
             flash('Status zamówienia został zaktualizowany.', 'success')
         elif 'edit' in request.form:
             order_id = request.form['order_id']
-            order_items = json.loads(request.form['order_items'])
+            order_items = []
+            for item_name, item_quantity, item_price in zip(request.form.getlist('item_name'), request.form.getlist('item_quantity'), request.form.getlist('item_price')):
+                if item_name and item_quantity and item_price:
+                    order_items.append({
+                        'name': item_name,
+                        'quantity': int(item_quantity),
+                        'price': float(item_price)
+                    })
             total_price = sum(item['price'] * item['quantity'] for item in order_items)
             conn.execute('UPDATE orders SET order_items = ?, total_price = ? WHERE id = ?', 
                          (json.dumps(order_items), total_price, order_id))
@@ -194,8 +201,22 @@ def admin():
         conn.commit()
     
     orders = conn.execute('SELECT * FROM orders').fetchall()
+    menu_items = {
+        'Przystawki': [
+            {'name': 'Przystawka 1', 'description': 'Opis przystawki 1', 'price': 20, 'image': 'przystawka1.jpg'},
+            {'name': 'Przystawka 2', 'description': 'Opis przystawki 2', 'price': 25, 'image': 'przystawka2.jpg'},
+        ],
+        'Dania główne': [
+            {'name': 'Danie główne 1', 'description': 'Opis dania głównego 1', 'price': 40, 'image': 'danie1.jpg'},
+            {'name': 'Danie główne 2', 'description': 'Opis dania głównego 2', 'price': 45, 'image': 'danie2.jpg'},
+        ],
+        'Desery': [
+            {'name': 'Deser 1', 'description': 'Opis deseru 1', 'price': 15, 'image': 'deser1.jpg'},
+            {'name': 'Deser 2', 'description': 'Opis deseru 2', 'price': 18, 'image': 'deser2.jpg'},
+        ],
+    }
     conn.close()
-    return render_template('admin.html', orders=orders)
+    return render_template('admin.html', orders=orders, menu=menu_items)
 
 def calculate_total_cost(cart):
     return sum(item['price'] * item['quantity'] for item in cart)

@@ -69,9 +69,17 @@
                         <div id="order-items-{{ order.id }}">
                             {% set items = order.order_items | fromjson %}
                             {% for item in items %}
-                            <div class="form-row mb-3">
+                            <div class="form-row mb-3 order-item">
                                 <div class="col">
-                                    <input type="text" class="form-control" name="item_name" value="{{ item.name }}" readonly>
+                                    <select class="form-control" name="item_name">
+                                        {% for category, menu_items in menu.items() %}
+                                            <optgroup label="{{ category }}">
+                                                {% for menu_item in menu_items %}
+                                                    <option value="{{ menu_item.name }}" data-price="{{ menu_item.price }}" {% if menu_item.name == item.name %}selected{% endif %}>{{ menu_item.name }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col">
                                     <input type="number" class="form-control" name="item_quantity" value="{{ item.quantity }}" min="1">
@@ -85,7 +93,7 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <button type="button" class="btn btn-secondary add-item">Dodaj pozycję</button>
+                        <button type="button" class="btn btn-secondary add-item" data-order-id="{{ order.id }}">Dodaj pozycję</button>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
                             <button type="submit" name="edit" class="btn btn-primary">Zapisz zmiany</button>
@@ -99,28 +107,41 @@
     
     <script>
         $(document).ready(function() {
-            $('.remove-item').on('click', function() {
-                $(this).closest('.form-row').remove();
+            $(document).on('click', '.remove-item', function() {
+                $(this).closest('.order-item').remove();
             });
 
-            $('.add-item').on('click', function() {
-                var orderId = $(this).closest('.modal').attr('id').replace('editOrderModal', '');
+            $(document).on('click', '.add-item', function() {
+                var orderId = $(this).data('order-id');
                 var newItemRow = `
-                    <div class="form-row mb-3">
+                    <div class="form-row mb-3 order-item">
                         <div class="col">
-                            <input type="text" class="form-control" name="item_name" placeholder="Nazwa dania">
+                            <select class="form-control" name="item_name">
+                                {% for category, menu_items in menu.items() %}
+                                    <optgroup label="{{ category }}">
+                                        {% for menu_item in menu_items %}
+                                            <option value="{{ menu_item.name }}" data-price="{{ menu_item.price }}">{{ menu_item.name }}</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col">
                             <input type="number" class="form-control" name="item_quantity" value="1" min="1">
                         </div>
                         <div class="col">
-                            <input type="number" class="form-control" name="item_price" placeholder="Cena">
+                            <input type="number" class="form-control" name="item_price" value="0" readonly>
                         </div>
                         <div class="col">
                             <button type="button" class="btn btn-danger remove-item">Usuń</button>
                         </div>
                     </div>`;
                 $('#order-items-' + orderId).append(newItemRow);
+            });
+
+            $(document).on('change', 'select[name="item_name"]', function() {
+                var price = $(this).find(':selected').data('price');
+                $(this).closest('.order-item').find('input[name="item_price"]').val(price);
             });
         });
     </script>
