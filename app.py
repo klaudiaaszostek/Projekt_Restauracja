@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask import Flask, render_template, redirect, url_for, request, session, flash, jsonify
 from functools import wraps
 import sqlite3
 import json
@@ -64,8 +64,7 @@ def menu():
 
         session['cart'].append(cart_item)
         session.modified = True
-        flash('Dodano do koszyka: {} x{}'.format(item_name, item_quantity), 'success')
-        return redirect(url_for('menu'))
+        return jsonify(success=True)
 
     menu_items = {
         'Przystawki': [

@@ -1,132 +1,140 @@
-{% extends "base.html" %} {% block title %}Menu - Restauracja XYZ{% endblock %}
-{% block content %}
-<h1>Nasze Menu</h1>
-<div id="menuAccordion">
-  {% for category, items in menu_items.items() %}
-  <div class="card">
-    <div class="card-header" id="heading{{ loop.index }}">
-      <h2 class="mb-0">
-        <button
-          class="btn btn-link"
-          type="button"
-          data-toggle="collapse"
-          data-target="#collapse{{ loop.index }}"
-          aria-expanded="true"
-          aria-controls="collapse{{ loop.index }}"
-        >
-          {{ category }}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Restauracja XYZ</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Restauracja XYZ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-      </h2>
-    </div>
-    <div
-      id="collapse{{ loop.index }}"
-      class="collapse {% if loop.first %}show{% endif %}"
-      aria-labelledby="heading{{ loop.index }}"
-      data-parent="#menuAccordion"
-    >
-      <div class="card-body">
-        {% for item in items %}
-        <div class="d-flex mb-3">
-          <div class="mr-3" style="max-width: 250px">
-            <img
-              src="{{ url_for('static', filename='images/' ~ item.image) }}"
-              alt="{{ item.name }}"
-              class="img-thumbnail"
-              data-toggle="modal"
-              data-target="#imageModal"
-              data-src="{{ url_for('static', filename='images/' ~ item.image) }}"
-            />
-          </div>
-          <div>
-            <h5>{{ item.name }}</h5>
-            <p>{{ item.description }}</p>
-            <p><strong>Cena: {{ item.price }} PLN</strong></p>
-            {% if session.get('logged_in') %}
-            <form method="POST" action="/menu" class="add-to-cart-form">
-              <input type="hidden" name="item_name" value="{{ item.name }}" />
-              <input
-                type="hidden"
-                name="item_description"
-                value="{{ item.description }}"
-              />
-              <input type="hidden" name="item_price" value="{{ item.price }}" />
-              <input type="hidden" name="item_image" value="{{ item.image }}" />
-              <div class="form-group">
-                <label for="quantity">Ilość</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  name="quantity"
-                  value="1"
-                  min="1"
-                  required
-                />
-              </div>
-              <button type="submit" class="btn btn-primary">
-                Dodaj do koszyka
-              </button>
-            </form>
-            {% else %}
-            <p class="text-danger">Zaloguj się, aby dodać do koszyka.</p>
-            {% endif %}
-          </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/menu">Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">Kontakt</a>
+                </li>
+                {% if session['logged_in'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                    {% if session['role'] == 'customer' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/customer">Koszyk i zamówienia</a>
+                        </li>
+                    {% elif session['role'] == 'staff' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/staff">Zamówienia</a>
+                        </li>
+                    {% elif session['role'] == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Zarządzanie zamówieniami</a>
+                        </li>
+                    {% endif %}
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-        {% endfor %}
-      </div>
+        <div class="navbar-nav ml-auto">
+            <a class="nav-link" href="/customer">Koszyk <span class="badge badge-primary">{{ session['cart']|length }}</span></a>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1>Nasze Menu</h1>
+        <div id="menuAccordion">
+            {% for category, items in menu_items.items() %}
+            <div class="card">
+                <div class="card-header" id="heading{{ loop.index }}">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                            {{ category }}
+                        </button>
+                    </h2>
+                </div>
+                <div id="collapse{{ loop.index }}" class="collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-parent="#menuAccordion">
+                    <div class="card-body">
+                        {% for item in items %}
+                        <div class="d-flex mb-3">
+                            <img src="{{ url_for('static', filename='images/' ~ item.image) }}" alt="{{ item.name }}" class="img-thumbnail mr-3" style="width: 150px;">
+                            <div>
+                                <h5>{{ item.name }}</h5>
+                                <p>{{ item.description }}</p>
+                                <p><strong>Cena: {{ item.price }} PLN</strong></p>
+                                <form method="POST" class="add-to-cart-form">
+                                    <input type="hidden" name="item_name" value="{{ item.name }}">
+                                    <input type="hidden" name="item_description" value="{{ item.description }}">
+                                    <input type="hidden" name="item_price" value="{{ item.price }}">
+                                    <input type="hidden" name="item_image" value="{{ item.image }}">
+                                    <div class="form-group">
+                                        <label for="quantity">Ilość</label>
+                                        <input type="number" class="form-control" name="quantity" min="1" value="1" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary add-to-cart-btn">Dodaj do koszyka</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-  </div>
-  {% endfor %}
-</div>
 
-<!-- Modal -->
-<div
-  class="modal fade"
-  id="imageModal"
-  tabindex="-1"
-  aria-labelledby="imageModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="imageModalLabel">Podgląd obrazka</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <img id="modalImage" src="" alt="Podgląd" class="img-fluid" />
-      </div>
+    <!-- Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Produkt dodany do koszyka</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Czy chcesz przejść do koszyka czy kontynuować zakupy?
+                </div>
+                <div class="modal-footer">
+                    <a href="/customer" class="btn btn-primary">Przejdź do koszyka</a>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kontynuuj zakupy</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-  $(document).ready(function () {
-    $(".add-to-cart-form").on("submit", function (event) {
-      event.preventDefault();
-
-      $.ajax({
-        type: "POST",
-        url: "/menu",
-        data: $(this).serialize(),
-        success: function (response) {
-          location.reload();
-        },
-      });
-    });
-
-    $("#imageModal").on("show.bs.modal", function (event) {
-      var button = $(event.relatedTarget); // Element, który wywołał modal
-      var src = button.data("src"); // Pobranie wartości data-src
-      var modal = $(this);
-      modal.find("#modalImage").attr("src", src); // Ustawienie src obrazka
-    });
-  });
-</script>
-{% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.add-to-cart-form').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: $(this).attr('method'),
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function() {
+                        $('#cartModal').modal('show');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
