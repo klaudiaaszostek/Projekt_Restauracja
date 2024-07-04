@@ -1,72 +1,78 @@
 {% extends "base.html" %} {% block title %}Koszyk i zamówienia - Restauracja
 XYZ{% endblock %} {% block content %}
-<h1>Witaj, {{ session['username'] }}</h1>
-<p>Tu możesz przeglądać i zamawiać dania.</p>
-
-<h2>Koszyk</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Zdjęcie</th>
-      <th>Nazwa dania</th>
-      <th>Opis</th>
-      <th>Cena</th>
-      <th>Ilość</th>
-      <th>Łączny koszt</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in session.cart %}
-    <tr>
-      <td>
-        <img
-          src="{{ url_for('static', filename='images/' ~ item.image) }}"
-          alt="{{ item.name }}"
-          class="img-thumbnail"
-          style="max-width: 100px"
-        />
-      </td>
-      <td>{{ item.name }}</td>
-      <td>{{ item.description }}</td>
-      <td>{{ item.price }} PLN</td>
-      <td>{{ item.quantity }}</td>
-      <td>{{ item.price * item.quantity }} PLN</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<p>
-  <strong>Całkowity koszt: {{ calculate_total_cost(session.cart) }} PLN</strong>
-</p>
-<form method="POST" action="/customer">
+<h1>Koszyk</h1>
+{% if session.cart and session.cart|length > 0 %}
+<h2>Pozycje:</h2>
+<ul class="list-group mb-3">
+  {% for item in session.cart %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    {{ item.name }} x{{ item.quantity }} ({{ item.price }} PLN)
+    <span>{{ item.price * item.quantity }} PLN</span>
+  </li>
+  {% endfor %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <strong>Łączny koszt</strong>
+    <strong>{{ calculate_total_cost(session.cart) }} PLN</strong>
+  </li>
+</ul>
+<h2>Wypełnij formularz:</h2>
+<form method="POST">
+  <div class="form-group">
+    <label for="customer_name">Imię i nazwisko</label>
+    <input
+      type="text"
+      class="form-control"
+      id="customer_name"
+      name="customer_name"
+      required
+    />
+  </div>
+  <div class="form-group">
+    <label for="customer_phone">Numer telefonu</label>
+    <input
+      type="tel"
+      class="form-control"
+      id="customer_phone"
+      name="customer_phone"
+      required
+    />
+  </div>
+  <div class="form-group">
+    <label for="customer_address">Adres dostawy</label>
+    <textarea
+      class="form-control"
+      id="customer_address"
+      name="customer_address"
+      rows="3"
+      required
+    ></textarea>
+  </div>
+  <div class="form-group">
+    <label for="customer_preferences">Preferencje dotyczące zamówienia</label>
+    <textarea
+      class="form-control"
+      id="customer_preferences"
+      name="customer_preferences"
+      rows="3"
+    ></textarea>
+  </div>
   <button type="submit" class="btn btn-primary">Zamów</button>
 </form>
-
-<h2>Twoje zamówienia</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th>ID zamówienia</th>
-      <th>Pozycje</th>
-      <th>Łączny koszt</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for order in orders %}
-    <tr>
-      <td>{{ order.id }}</td>
-      <td>
-        <ul>
-          {% set items = order.order_items | fromjson %} {% for item in items %}
-          <li>{{ item.name }} x{{ item.quantity }} ({{ item.price }} PLN)</li>
-          {% endfor %}
-        </ul>
-      </td>
-      <td>{{ order.total_price }} PLN</td>
-      <td>{{ order.status }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% else %}
+<p>Twój koszyk jest pusty.</p>
+{% endif %}
+<h2>Historia zamówień</h2>
+<ul class="list-group">
+  {% for order in orders %}
+  <li class="list-group-item">
+    Zamówienie #{{ order.id }} - Status: {{ order.status }}
+    <ul>
+      {% set items = order.order_items | fromjson %} {% for item in items %}
+      <li>{{ item.name }} x{{ item.quantity }} ({{ item.price }} PLN)</li>
+      {% endfor %}
+    </ul>
+    <strong>Łączny koszt: {{ order.total_price }} PLN</strong>
+  </li>
+  {% endfor %}
+</ul>
 {% endblock %}

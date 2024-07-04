@@ -140,17 +140,53 @@ def customer():
     conn = get_db_connection()
     if request.method == 'POST':
         if 'cart' in session:
+            customer_name = request.form['customer_name']
+            customer_phone = request.form['customer_phone']
+            customer_address = request.form['customer_address']
+            customer_preferences = request.form['customer_preferences']
+
             order_items = json.dumps(session['cart'])
             total_price = calculate_total_cost(session['cart'])
-            conn.execute('INSERT INTO orders (user_id, order_items, total_price, status) VALUES (?, ?, ?, ?)',
-                         (session['user_id'], order_items, total_price, 'Przyjęte'))
+            cursor = conn.execute('INSERT INTO orders (user_id, order_items, total_price, status, customer_name, customer_phone, customer_address, customer_preferences) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                         (session['user_id'], order_items, total_price, 'Przyjęte', customer_name, customer_phone, customer_address, customer_preferences))
             conn.commit()
+            order_id = cursor.lastrowid
             session.pop('cart', None)
             flash('Zamówienie złożone pomyślnie.', 'success')
+            return redirect(url_for('rate_order', order_id=order_id))
     
     orders = conn.execute('SELECT * FROM orders WHERE user_id = ?', (session['user_id'],)).fetchall()
     conn.close()
     return render_template('customer.html', orders=orders)
+
+@app.route('/rate_order/<int:order_id>', methods=['GET', 'POST'])
+@login_required
+def rate_order(order_id):
+    conn = get_db_connection()
+    order = conn.execute('SELECT * FROM orders WHERE id = ?', (order_id,)).fetchone()
+    if request.method == 'POST':
+        dish_ratings = []
+        for item_name, rating, comment in zip(request.form.getlist('dish_name'), request.form.getlist('dish_rating'), request.form.getlist('dish_comment')):
+            dish_ratings.append((order_id, item_name, int(rating), comment))
+        
+        conn.executemany('INSERT INTO dish_ratings (order_id, dish_name, rating, comment) VALUES (?, ?, ?, ?)', dish_ratings)
+
+        restaurant_rating = (
+            order_id,
+            int(request.form['delivery_time_rating']),
+            int(request.form['service_rating']),
+            int(request.form['food_quality_rating']),
+            int(request.form['value_for_money_rating']),
+            request.form['restaurant_comment']
+        )
+        conn.execute('INSERT INTO restaurant_ratings (order_id, delivery_time_rating, service_rating, food_quality_rating, value_for_money_rating, comment) VALUES (?, ?, ?, ?, ?, ?)', restaurant_rating)
+        conn.commit()
+        conn.close()
+        flash('Dziękujemy za ocenę!', 'success')
+        return redirect(url_for('customer'))
+
+    items = json.loads(order['order_items'])
+    return render_template('rate_order.html', order=order, items=items)
 
 @app.route('/staff', methods=['GET', 'POST'])
 @login_required

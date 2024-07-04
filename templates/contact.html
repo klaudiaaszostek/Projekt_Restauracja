@@ -15,7 +15,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Restauracja XYZ</a>
+      <a class="navbar-brand" href="/">Restauracja XYZ</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -38,21 +38,34 @@
           <li class="nav-item">
             <a class="nav-link" href="/contact">Kontakt</a>
           </li>
+          {% if session['logged_in'] %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+          {% if session['role'] == 'customer' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/customer">Koszyk i zamówienia</a>
+          </li>
+          {% elif session['role'] == 'staff' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/staff">Zamówienia</a>
+          </li>
+          {% elif session['role'] == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin">Zarządzanie zamówieniami</a>
+          </li>
+          {% endif %} {% else %}
           <li class="nav-item">
             <a class="nav-link" href="/login">Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/register">Rejestracja</a>
+            <a class="nav-link" href="/register">Register</a>
           </li>
+          {% endif %}
         </ul>
       </div>
     </nav>
     <div class="container mt-5">
-      <h2>Godziny otwarcia</h2>
-      <p>Poniedziałek - Piątek: 10:00 - 22:00</p>
-      <p>Sobota - Niedziela: 12:00 - 24:00</p>
-      <h2>Lokalizacja</h2>
-      <p>ul. Przykładowa 123, 00-001 Warszawa</p>
       <h1>Kontakt</h1>
       <p>Jeśli masz pytania, skontaktuj się z nami:</p>
       <h2>Dane kontaktowe</h2>

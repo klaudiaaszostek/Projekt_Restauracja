@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block title %}Oceń zamówienie - Restauracja XYZ{%
+endblock %} {% block content %}
+<h1>Oceń zamówienie #{{ order.id }}</h1>
+<form method="POST">
+  <h2>Oceń dania</h2>
+  {% for item in items %}
+  <div class="form-group">
+    <label>{{ item.name }}</label>
+    <div class="form-row">
+      <div class="col">
+        <input type="hidden" name="dish_name" value="{{ item.name }}" />
+        <select name="dish_rating" class="form-control">
+          <option value="5">5</option>
+          <option value="4">4</option>
+          <option value="3">3</option>
+          <option value="2">2</option>
+          <option value="1">1</option>
+        </select>
+      </div>
+      <div class="col">
+        <input
+          type="text"
+          name="dish_comment"
+          class="form-control"
+          placeholder="Komentarz"
+        />
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <h2>Oceń restaurację</h2>
+  <div class="form-group">
+    <label>Czas dostawy</label>
+    <select name="delivery_time_rating" class="form-control">
+      <option value="5">5</option>
+      <option value="4">4</option>
+      <option value="3">3</option>
+      <option value="2">2</option>
+      <option value="1">1</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Obsługa</label>
+    <select name="service_rating" class="form-control">
+      <option value="5">5</option>
+      <option value="4">4</option>
+      <option value="3">3</option>
+      <option value="2">2</option>
+      <option value="1">1</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Jakość jedzenia</label>
+    <select name="food_quality_rating" class="form-control">
+      <option value="5">5</option>
+      <option value="4">4</option>
+      <option value="3">3</option>
+      <option value="2">2</option>
+      <option value="1">1</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Stosunek jakości do ceny</label>
+    <select name="value_for_money_rating" class="form-control">
+      <option value="5">5</option>
+      <option value="4">4</option>
+      <option value="3">3</option>
+      <option value="2">2</option>
+      <option value="1">1</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Komentarz</label>
+    <textarea
+      name="restaurant_comment"
+      class="form-control"
+      rows="3"
+    ></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Zapisz oceny</button>
+</form>
+{% endblock %}

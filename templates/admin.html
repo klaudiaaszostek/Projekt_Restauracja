@@ -71,30 +71,26 @@
                             {% for item in items %}
                             <div class="form-row mb-3 order-item">
                                 <div class="col">
-                                    <select class="form-control" name="item_name">
-                                        {% for category, menu_items in menu.items() %}
-                                            <optgroup label="{{ category }}">
-                                                {% for menu_item in menu_items %}
-                                                    <option value="{{ menu_item.name }}" data-price="{{ menu_item.price }}" {% if menu_item.name == item.name %}selected{% endif %}>{{ menu_item.name }}</option>
-                                                {% endfor %}
-                                            </optgroup>
-                                        {% endfor %}
-                                    </select>
+                                    <label>Nazwa dania</label>
+                                    <input type="text" class="form-control" name="item_name" value="{{ item.name }}" readonly>
                                 </div>
                                 <div class="col">
-                                    <input type="number" class="form-control" name="item_quantity" value="{{ item.quantity }}" min="1">
+                                    <label>Ilość</label>
+                                    <input type="number" class="form-control item-quantity" name="item_quantity" value="{{ item.quantity }}" min="1">
                                 </div>
                                 <div class="col">
-                                    <input type="number" class="form-control" name="item_price" value="{{ item.price }}" readonly>
+                                    <label>Cena pojedyńczego</label>
+                                    <input type="number" class="form-control item-price" name="item_price" value="{{ item.price }}" readonly>
                                 </div>
                                 <div class="col">
-                                    <button type="button" class="btn btn-danger remove-item">Usuń</button>
+                                    <label>Kwota całości</label>
+                                    <input type="number" class="form-control item-total" value="{{ item.price * item.quantity }}" readonly>
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
-                        <button type="button" class="btn btn-secondary add-item" data-order-id="{{ order.id }}">Dodaj pozycję</button>
                         <div class="modal-footer">
+                            <span class="order-total-price">Łączny koszt: {{ order.total_price }} PLN</span>
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
                             <button type="submit" name="edit" class="btn btn-primary">Zapisz zmiany</button>
                         </div>
@@ -107,42 +103,21 @@
     
     <script>
         $(document).ready(function() {
-            $(document).on('click', '.remove-item', function() {
-                $(this).closest('.order-item').remove();
+            $(document).on('change', '.item-quantity', function() {
+                var quantity = $(this).val();
+                var price = $(this).closest('.order-item').find('.item-price').val();
+                var total = quantity * price;
+                $(this).closest('.order-item').find('.item-total').val(total);
+                updateTotalPrice();
             });
 
-            $(document).on('click', '.add-item', function() {
-                var orderId = $(this).data('order-id');
-                var newItemRow = `
-                    <div class="form-row mb-3 order-item">
-                        <div class="col">
-                            <select class="form-control" name="item_name">
-                                {% for category, menu_items in menu.items() %}
-                                    <optgroup label="{{ category }}">
-                                        {% for menu_item in menu_items %}
-                                            <option value="{{ menu_item.name }}" data-price="{{ menu_item.price }}">{{ menu_item.name }}</option>
-                                        {% endfor %}
-                                    </optgroup>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col">
-                            <input type="number" class="form-control" name="item_quantity" value="1" min="1">
-                        </div>
-                        <div class="col">
-                            <input type="number" class="form-control" name="item_price" value="0" readonly>
-                        </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-danger remove-item">Usuń</button>
-                        </div>
-                    </div>`;
-                $('#order-items-' + orderId).append(newItemRow);
-            });
-
-            $(document).on('change', 'select[name="item_name"]', function() {
-                var price = $(this).find(':selected').data('price');
-                $(this).closest('.order-item').find('input[name="item_price"]').val(price);
-            });
+            function updateTotalPrice() {
+                var totalPrice = 0;
+                $('.item-total').each(function() {
+                    totalPrice += parseFloat($(this).val());
+                });
+                $('.modal-footer').find('.order-total-price').text('Łączny koszt: ' + totalPrice + ' PLN');
+            }
         });
     </script>
 {% endblock %}

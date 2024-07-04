@@ -44,3 +44,4 @@ Etapy:
 2. Wstępny Back-end w Python (Flask).
 3. Trzy widoki, koszyk w sesji. Tylko użytkownik z odpowiednią rolą ma dostęp to poszczególnych funkcjonalności.
 4. Usprawnienie zarządzania zamówieniami, różne w zależności od roli przypisanej do użytkownika.
+5. Poprawki.
