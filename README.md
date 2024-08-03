@@ -2,8 +2,6 @@
 
 Józefina Młynarska, Klaudia Szostek
 
-Grupa nr 4, godz. 13:15
-
 Aplikacja webowa do zamawiania jedzenia z restauracji
 
 Cel Projektu
